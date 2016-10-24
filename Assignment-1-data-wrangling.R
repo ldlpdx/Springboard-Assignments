@@ -22,5 +22,32 @@ refine <- separate(refine, Product.code...number, into = c("product_code", "prod
 look_up_table <- c('p' = 'Smartphone', 'v' = 'TV', 'x' = 'Laptop', 'q' = 'Tablet')
 refine$product_category <- factor(look_up_table[refine$product_code])
 
+## Add geocoded variable for addresses
+refine$full_address <- paste(refine$address, refine$city, refine$country, sep=",")
+
+## Create dummy vars for company and product
+
+create_dummy <- function(vec, value){
+  return(as.integer(vec == value))
+}
+
+company_names <- as.character(unique(refine$company))
+
+for(company in company_names){
+  new_var_name <- paste0('company_',company)
+  refine[[new_var_name]] <- create_dummy(refine$company, company)
+}
+
+product_names <- as.character(unique(refine$product_category))
+
+for(product in product_names){
+  new_var_name <- paste0('product_',product)
+  refine[[new_var_name]] <- create_dummy(refine$product_category, product)
+}
+
+## Submit to github
+
+write.csv(refine, "refine_clean.csv")
+
                                
                         
